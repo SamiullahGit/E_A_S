@@ -15,4 +15,6 @@ COPY frontend/ frontend/
 ENV PORT=8000
 ENV DEV_MODE=false
 
+EXPOSE 8000
+
 CMD ["python", "run.py"]
