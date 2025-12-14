@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary-dark: #050811;
+            --card-bg: rgba(22, 28, 40, 0.8);
+            --accent-blue: #4A90E2;
+            --accent-teal: #00D1A0;
+            --accent-purple: #B57EDC;
+            --text-primary: #E0E6F0;
+            --text-secondary: #AAB3C7;
+            --transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            background: var(--primary-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Split Layout */
+        .split-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Left Side - New Employee */
+        .new-employee-side {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 209, 160, 0.1), rgba(0, 153, 102, 0.05));
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Changed to flex-start */
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+            transform: translateX(0);
+            opacity: 1;
+            min-width: 400px;
+        }
+
+        /* Right Side - Login */
+        .login-side {
+            flex: 1.5;
+            background: var(--card-bg);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            min-width: 500px;
+        }
+
+        /* When signup form is active - ULTRA SMOOTH ANIMATION */
+        .signup-active .new-employee-side {
+            flex: 0;
+            opacity: 0;
+            transform: translateX(-100%) scale(0.95);
+            padding: 0;
+            border-right: none;
+            min-width: 0;
+            width: 0;
+            margin: 0;
+            overflow: visible;
+        }
+
+        .signup-active .login-side {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 100%;
+            transform: translateX(0);
+        }
+
+        .signup-active .right-content {
+            animation: fluidFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes fluidFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Back Button with better spacing */
+        .back-btn {
+            position: absolute;
+            top: 3rem; /* Increased from 2.5rem for more spacing */
+            left: 3rem; /* Increased from 2.5rem */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 1rem 1.8rem;
+            background: linear-gradient(135deg, var(--accent-purple), #8A2BE2);
+            border: none;
+            border-radius: 50px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: softPulse 4s infinite;
+            transform-origin: center;
+        }
+
+        @keyframes softPulse {
+            0%, 100% {
+                box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(138, 43, 226, 0.6), 0 0 25px rgba(138, 43, 226, 0.3);
+                transform: scale(1.03);
+            }
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            background: linear-gradient(135deg, #8A2BE2, var(--accent-purple));
+            box-shadow: 0 10px 35px rgba(138, 43, 226, 0.7), 0 0 40px rgba(138, 43, 226, 0.4);
+        }
+
+        .back-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .back-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Left Side Content */
+        .left-content {
+            max-width: 400px;
+            text-align: center;
+            transition: var(--transition);
+            will-change: transform, opacity;
+            margin-top: 8rem; /* Pushed content down to create space from back button */
+            opacity: 0;
+            animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-icon {
+            font-size: 4.5rem; /* Slightly larger icon */
+            color: var(--accent-teal);
+            margin-bottom: 2rem; /* Increased spacing */
+            filter: drop-shadow(0 0 25px rgba(0, 209, 160, 0.4));
+            transition: var(--transition);
+            animation: gentleFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg); 
+            }
+            33% { 
+                transform: translateY(-8px) rotate(1deg); 
+            }
+            66% { 
+                transform: translateY(4px) rotate(-1deg); 
+            }
+        }
+
+        .left-title {
+            font-size: 2.8rem; /* Slightly larger */
+            font-weight: 700;
+            margin-bottom: 1.5rem; /* Increased spacing */
+            background: linear-gradient(135deg, var(--accent-teal), #00b377);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: var(--transition);
+            line-height: 1.2;
+        }
+
+        .left-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.15rem; /* Slightly larger */
+            line-height: 1.7;
+            margin-bottom: 3.5rem; /* Increased spacing */
+            transition: var(--transition);
+            opacity: 0.9;
+        }
+
+        /* Enhanced Circular Button */
+        .circle-btn-container {
+            position: relative;
+            margin: 2.5rem 0; /* Increased spacing */
+            transition: var(--transition);
+        }
+
+        .circle-btn {
+            width: 170px; /* Slightly larger */
+            height: 170px;
+            background: linear-gradient(135deg, var(--accent-teal), #009966);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            border: 5px solid rgba(0, 209, 160, 0.4); /* Thicker border */
+            cursor: pointer;
+            animation: gentleFloat 5s ease-in-out infinite;
+            animation-delay: 0.5s;
+            will-change: transform;
+        }
+
+        .circle-btn::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            background: linear-gradient(135deg, var(--accent-teal), #009966);
+            border-radius: 50%;
+            opacity: 0.25;
+            filter: blur(25px);
+            z-index: -1;
+            transition: var(--transition);
+        }
+
+        .circle-btn:hover {
+            transform: scale(1.15) rotate(-5deg);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 80px rgba(0, 209, 160, 0.6);
+        }
+
+        .circle-btn i {
+            font-size: 3.8rem; /* Slightly larger */
+            margin-bottom: 0.8rem; /* Increased spacing */
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+            transition: var(--transition);
+        }
+
+        .circle-btn-text {
+            font-size: 1.1rem; /* Slightly larger */
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 0.6px;
+            transition: var(--transition);
+            line-height: 1.3;
+        }
+
+        .circle-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 1.2rem; /* Increased spacing */
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+
+        /* Features List */
+        .features-list {
+            list-style: none;
+            margin-top: 3rem; /* Increased spacing */
+            text-align: left;
+            transition: var(--transition);
+            opacity: 0;
+            animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.4s;
+        }
+
+        .features-list li {
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem; /* Increased spacing */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* Increased spacing */
+            font-size: 1rem; /* Slightly larger */
+            transition: var(--transition);
+            opacity: 0.9;
+        }
+
+        .features-list li i {
+            color: var(--accent-teal);
+            font-size: 1.1rem; /* Slightly larger */
+            transition: var(--transition);
+        }
+
+        /* Right Side Content */
+        .right-content {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            transition: var(--transition);
+            will-change: transform, opacity;
+            opacity: 0;
+            animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: left;
+            margin-bottom: 3rem; /* Increased spacing */
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem; /* Increased spacing */
+            margin-bottom: 1.8rem; /* Increased spacing */
+        }
+
+        .logo-icon {
+            width: 55px; /* Slightly larger */
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-blue), #266DD3);
+            border-radius: 14px; /* Slightly more rounded */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem; /* Slightly larger */
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .logo-text {
+            font-size: 2.2rem; /* Slightly larger */
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), #266DD3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem; /* Slightly larger */
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 2rem; /* Increased spacing */
+        }
+
+        label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem; /* Increased spacing */
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            opacity: 0.9;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 1.1rem 1.1rem 1.1rem 3.2rem; /* Increased padding */
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px; /* Slightly more rounded */
+            color: var(--text-primary);
+            font-size: 1.05rem; /* Slightly larger */
+            transition: var(--transition);
+        }
+
+        input:focus {
+            border-color: var(--accent-blue);
+            background: rgba(74, 144, 226, 0.08);
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.25);
+            outline: none;
+            transform: translateY(-2px);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Buttons */
+        .otp-btn {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--accent-purple), #915CB0);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.05rem;
+            cursor: pointer;
+            margin-top: 0.6rem;
+            transition: var(--transition);
+        }
+
+        .otp-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(181, 126, 220, 0.45);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--accent-blue), #266DD3);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.15rem;
+            cursor: pointer;
+            margin-top: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 35px rgba(74, 144, 226, 0.35);
+        }
+
+        /* Background Animations */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.12;
+            animation: fluidMove 30s infinite linear;
+            will-change: transform;
+        }
+
+        .shape-1 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent-teal);
+            top: 15%;
+            left: 5%;
+            animation-delay: -5s;
+        }
+
+        .shape-2 {
+            width: 250px;
+            height: 250px;
+            background: var(--accent-blue);
+            bottom: 15%;
+            right: 5%;
+            animation-delay: -15s;
+        }
+
+        @keyframes fluidMove {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg) scale(1); 
+            }
+            25% { 
+                transform: translate(30px, 50px) rotate(90deg) scale(1.05); 
+            }
+            50% { 
+                transform: translate(0, 100px) rotate(180deg) scale(1); 
+            }
+            75% { 
+                transform: translate(-30px, 50px) rotate(270deg) scale(0.95); 
+            }
+        }
+
+        /* Alert */
+        .alert {
+            background: rgba(0, 209, 160, 0.12);
+            border: 1.5px solid var(--accent-teal);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.8rem;
+            display: none;
+            text-align: center;
+            animation: gentleAlert 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes gentleAlert {
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Signup Form */
+        #signup-section {
+            display: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 1.1rem 1.1rem 1.1rem 3.2rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            appearance: none;
+        }
+        /* Darker Security Question dropdown */
+#security-question {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    color: var(--text-primary);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23AAB3C7'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center;
+    background-size: 20px;
+}
+
+#security-question:focus {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 30px rgba(74, 144, 226, 0.25);
+}
+
+/* Make dropdown options darker */
+#security-question option {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+/* Make the first option (placeholder) gray */
+#security-question option[value=""] {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Darker icon color */
+#security-question ~ .input-icon {
+    color: var(--text-secondary);
+}
+
+        /* Back to Login Link */
+        .back-to-login {
+            text-align: center;
+            margin-top: 2.5rem;
+            padding-top: 2.5rem;
+            border-top: 1.5px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .back-to-login a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            font-size: 1.05rem;
+        }
+
+        .back-to-login a:hover {
+            transform: translateX(-8px);
+            color: var(--accent-teal);
+        }
+
+        /* Enhanced smooth transitions for all elements */
+        .new-employee-side *,
+        .login-side * {
+            transition: var(--transition);
+        }
+
+        /* Optimize animations for performance */
+        .new-employee-side, 
+        .login-side, 
+        .right-content,
+        .left-content,
+        .circle-btn,
+        .shape,
+        .welcome-icon {
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .split-container {
+                flex-direction: column;
+                min-height: auto;
+            }
+            
+            .new-employee-side, .login-side {
+                padding: 2.5rem;
+                min-height: auto;
+                width: 100%;
+                min-width: 100% !important;
+            }
+            
+            .new-employee-side {
+                border-right: none;
+                border-bottom: 1.5px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .signup-active .split-container {
+                flex-direction: column;
+            }
+            
+            .signup-active .new-employee-side {
+                display: none;
+            }
+            
+            .signup-active .login-side {
+                width: 100%;
+                min-height: 100vh;
+            }
+            
+            .back-btn {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 2.5rem;
+                align-self: flex-start;
+            }
+            
+            .left-content {
+                margin-top: 5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-title {
+                font-size: 2.3rem;
+            }
+            
+            .circle-btn {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .circle-btn i {
+                font-size: 3.2rem;
+            }
+            
+            .back-btn {
+                font-size: 0.95rem;
+                padding: 0.9rem 1.6rem;
+                top: 2.5rem;
+                left: 2.5rem;
+            }
+            
+            .left-content {
+                margin-top: 6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-content {
+                margin-top: 4rem;
+            }
+            
+            .back-btn {
+                top: 2rem;
+                left: 2rem;
+            }
+        }
+
+        /* Password Strength Requirements */
+        .password-requirements {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .password-requirements-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .password-requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .password-requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-check {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .password-requirement.met .requirement-check {
+            background: #00ff88;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .password-requirement.met {
+            color: #00ff88;
+        }
+
+        .password-requirement.met .requirement-check::after {
+            content: '✓';
+            color: #050811;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        /* Email Validation Styling */
+        input.email-valid {
+            border-color: #00ff88 !important;
+            background: rgba(0, 255, 136, 0.08) !important;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.25) !important;
+        }
+
+        input.email-invalid {
+            border-color: #ff4560 !important;
+            background: rgba(255, 69, 96, 0.08) !important;
+            box-shadow: 0 0 20px rgba(255, 69, 96, 0.25) !important;
+        }
+
+        .input-group .validation-icon {
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .input-group input.email-valid ~ .validation-icon {
+            opacity: 1;
+            color: #00ff88;
+        }
+
+        .input-group input.email-invalid ~ .validation-icon {
+            opacity: 1;
+            color: #ff4560;
+        }
+
+        .email-feedback {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .email-feedback.show {
+            opacity: 1;
+            height: auto;
+            margin-top: 0.6rem;
+        }
+
+        .email-feedback.valid {
+            color: #00ff88;
+        }
+
+        .email-feedback.invalid {
+            color: #ff4560;
+        }
+    </style>
+</head>
+<body>
+    <!-- Split Layout -->
+    <div class="split-container" id="splitContainer">
+        <!-- Left Side - New Employee -->
+        <div class="new-employee-side">
+            <!-- Background -->
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+            </div>
+            
+            <!-- Enhanced Back Button with better spacing -->
+            <a href="role-select.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Selection Role
+            </a>
+            
+            <!-- Content - Moved down for better spacing -->
+            <div class="left-content">
+                <div class="welcome-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                
+                <h1 class="left-title">Join Our Team</h1>
+                <p class="left-subtitle">
+                    Create your employee account to start tracking attendance, 
+                    manage your schedule, and access company resources.
+                </p>
+                
+                <!-- Circular Button -->
+                <div class="circle-btn-container">
+                    <a href="#" class="circle-btn" id="show-signup">
+                        <i class="fas fa-user-plus"></i>
+                        <div class="circle-btn-text">Create<br>Account</div>
+                    </a>
+                    <div class="circle-label">Click to register as new employee</div>
+                </div>
+                
+                <!-- Features -->
+                <ul class="features-list">
+                    <li><i class="fas fa-check-circle"></i> Easy account setup</li>
+                    <li><i class="fas fa-check-circle"></i> Secure login system</li>
+                    <li><i class="fas fa-check-circle"></i> Real-time tracking</li>
+                    <li><i class="fas fa-check-circle"></i> 24/7 access</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Side - Login -->
+        <div class="login-side">
+            <!-- Background -->
+            <div class="floating-shapes">
+                <div class="shape shape-2"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="right-content">
+                <!-- Header -->
+                <div class="header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+                        <h1 class="logo-text">Employee Login</h1>
+                    </div>
+                    <p class="subtitle">Welcome back. Enter your credentials to access your dashboard.</p>
+                </div>
+
+                <!-- Alert -->
+                <div id="alert" class="alert"></div>
+
+                <!-- Login Form -->
+                <div id="login-section">
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="email" placeholder="admin@company.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="password" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Security Answer</label>
+                            <div class="input-group">
+                                <i class="fas fa-shield-alt input-icon"></i>
+                                <input type="text" id="security-answer" placeholder="Your security answer" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>One-Time Password (OTP)</label>
+                            <div class="input-group">
+                                <i class="fas fa-key input-icon"></i>
+                                <input type="text" id="otp" placeholder="Enter 6-digit OTP" maxlength="6" required>
+                            </div>
+                            <button type="button" id="request-otp" class="otp-btn">
+                                Send OTP to Email
+                            </button>
+                        </div>
+
+                        <button type="submit" class="login-btn">
+                            Login to Dashboard
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Signup Form -->
+                <div id="signup-section">
+                    <div class="header">
+                        <h1 class="left-title" style="font-size: 2.2rem; margin-bottom: 1.2rem;">Create Account</h1>
+                        <p class="subtitle">Fill in your details to register as a new employee.</p>
+                    </div>
+
+                    <form id="signup-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <div class="input-group">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="full-name" placeholder="John Doe" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="signup-email" placeholder="john.doe@company.com" required>
+                                <i class="fas fa-check-circle validation-icon"></i>
+                            </div>
+                            <div class="email-feedback" id="email-feedback"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>CNIC Number</label>
+                            <div class="input-group">
+                                <i class="fas fa-id-card input-icon"></i>
+                                <input type="text" id="cnic" placeholder="XXXXX-XXXXXXX-X" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Security Question</label>
+                            <div class="input-group">
+                                <i class="fas fa-question-circle input-icon"></i>
+                                <select id="security-question" required>
+                                    <option value="">Select security question</option>
+                                    <option value="What is your mother's maiden name?">Mother's maiden name</option>
+                                    <option value="What was your first pet's name?">First pet's name</option>
+                                    <option value="What elementary school did you attend?">Elementary school</option>
+                                    <option value="What is your favorite book?">What is your favorite book?</option>
+                                    <option value="What city were you born in?">What city were you born in?</option>
+                                    <option value="What was the name of your first stuffed toy?">What was the name of your first stuffed toy?</option>
+                                    <option value="What is your favorite childhood friend's nickname?">What is your favorite childhood friend's nickname?</option>
+                                    <option value="What was the make and model of your first car?">What was the make and model of your first car?</option>
+                                    <option value="What is the name of the street you grew up on?">What is the name of the street you grew up on?</option>
+                                    <option value="What was your favorite subject in high school?">What was your favorite subject in high school?</option>
+                                    <option value="What is your favorite movie of all time?">What is your favorite movie of all time?</option>
+                                    <option value="What is the name of your favorite sports team?">What is the name of your favorite sports team?</option>
+                                    <option value="What was your first smartphone model?">What was your first smartphone model?</option>
+                                    <option value="What is your favorite holiday destination?">What is your favorite holiday destination?</option>
+                                    <option value="What is your favorite board game?">What is your favorite board game?</option>
+                                    <option value="What was the name of your favorite teacher?">What was the name of your favorite teacher?</option>
+                                    <option value="What is your favorite type of cuisine?">What is your favorite type of cuisine?</option>
+                                    <option value="What was your first job title?">What was your first job title?</option>
+                                    <option value="What is your favorite musical instrument?">What is your favorite musical instrument?</option>
+                                    <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Security Answer</label>
+                            <div class="input-group">
+                                <i class="fas fa-shield-alt input-icon"></i>
+                                <input type="text" id="security-answer-signup" placeholder="Your answer" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="signup-password" placeholder="Create a secure password" required>
+                            </div>
+                            
+                            <div class="password-requirements">
+                                <div class="password-requirements-title">
+                                    <i class="fas fa-check-circle"></i>
+                                    Password Requirements:
+                                </div>
+                                <div class="password-requirement" id="req-length">
+                                    <div class="requirement-check"></div>
+                                    <span>At least 10 characters</span>
+                                </div>
+                                <div class="password-requirement" id="req-uppercase">
+                                    <div class="requirement-check"></div>
+                                    <span>At least one uppercase letter</span>
+                                </div>
+                                <div class="password-requirement" id="req-lowercase">
+                                    <div class="requirement-check"></div>
+                                    <span>At least one lowercase letter</span>
+                                </div>
+                                <div class="password-requirement" id="req-number">
+                                    <div class="requirement-check"></div>
+                                    <span>At least one number</span>
+                                </div>
+                                <div class="password-requirement" id="req-special">
+                                    <div class="requirement-check"></div>
+                                    <span>At least one special character (!@#$%^&*)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="login-btn">
+                            Create Employee Account
+                        </button>
+                    </form>
+
+                    <div class="back-to-login">
+                        <a href="#" id="show-login">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const splitContainer = document.getElementById('splitContainer');
+        const loginSection = document.getElementById('login-section');
+        const signupSection = document.getElementById('signup-section');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const requestOtpBtn = document.getElementById('request-otp');
+        const alertDiv = document.getElementById('alert');
+        const leftContent = document.querySelector('.left-content');
+        const rightContent = document.querySelector('.right-content');
+
+        // Show alert
+        function showAlert(message, type = 'success') {
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            alertDiv.style.background = type === 'error' ? 
+                'rgba(255, 69, 96, 0.12)' : 
+                'rgba(0, 209, 160, 0.12)';
+            alertDiv.style.borderColor = type === 'error' ? 
+                '#FF4560' : 'var(--accent-teal)';
+            alertDiv.style.color = type === 'error' ? 
+                '#FF4560' : 'var(--accent-teal)';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Ultra-smooth transition to signup
+        showSignupBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Prevent multiple clicks during animation
+            if (splitContainer.classList.contains('signup-active')) return;
+            
+            // Prepare for smooth transition
+            splitContainer.style.overflow = 'hidden';
+            showSignupBtn.style.pointerEvents = 'none';
+            
+            // Hide login immediately
+            loginSection.style.display = 'none';
+            
+            // Start animation
+            splitContainer.classList.add('signup-active');
+            
+            // Show signup after a small delay for smoother transition
+            setTimeout(() => {
+                signupSection.style.display = 'block';
+                alertDiv.style.display = 'none';
+                
+                // Change back button text
+                const backBtn = document.querySelector('.back-btn');
+                backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Login';
+                backBtn.href = '#';
+                
+                // Update back button functionality
+                backBtn.onclick = (e) => {
+                    e.preventDefault();
+                    switchToLogin();
+                };
+                
+                // Allow interactions after animation
+                setTimeout(() => {
+                    splitContainer.style.overflow = 'auto';
+                    showSignupBtn.style.pointerEvents = 'auto';
+                }, 300);
+            }, 450); // Perfect timing for smooth flow
+        });
+
+        // Smooth transition to login
+        function switchToLogin() {
+            // Prevent multiple clicks during animation
+            if (!splitContainer.classList.contains('signup-active')) return;
+            
+            // Prepare for transition
+            splitContainer.style.overflow = 'hidden';
+            
+            // Hide form immediately
+            signupSection.style.display = 'none';
+            
+            // Show login immediately
+            loginSection.style.display = 'block';
+            
+            // Remove active class for smooth animation
+            splitContainer.classList.remove('signup-active');
+            
+            // Restore back button after animation
+            setTimeout(() => {
+                const backBtn = document.querySelector('.back-btn');
+                backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Selection Role';
+                backBtn.href = 'role-select.html';
+                
+                // Restore original back button functionality
+                backBtn.onclick = null;
+                
+                // Allow scrolling after animation
+                setTimeout(() => {
+                    splitContainer.style.overflow = 'auto';
+                }, 300);
+            }, 450);
+        }
+
+        // Switch to login from link
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchToLogin();
+        });
+
+        // Password Strength Validation
+        const signupPassword = document.getElementById('signup-password');
+        const passwordRequirements = {
+            'req-length': /^.{10,}$/,
+            'req-uppercase': /[A-Z]/,
+            'req-lowercase': /[a-z]/,
+            'req-number': /[0-9]/,
+            'req-special': /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
+        };
+
+        function validatePassword() {
+            const password = signupPassword.value;
+            
+            Object.keys(passwordRequirements).forEach(reqId => {
+                const requirement = document.getElementById(reqId);
+                const isValid = passwordRequirements[reqId].test(password);
+                
+                if (isValid) {
+                    requirement.classList.add('met');
+                } else {
+                    requirement.classList.remove('met');
+                }
+            });
+        }
+
+        signupPassword.addEventListener('input', validatePassword);
+        signupPassword.addEventListener('focus', validatePassword);
+
+        // Prevent form submission if password requirements not met
+        signupForm.addEventListener('submit', (e) => {
+            const password = signupPassword.value;
+            let allMet = true;
+            
+            for (let pattern of Object.values(passwordRequirements)) {
+                if (!pattern.test(password)) {
+                    allMet = false;
+                    break;
+                }
+            }
+            
+            if (!allMet) {
+                e.preventDefault();
+                showAlert('Please meet all password requirements', 'error');
+            }
+        });
+
+
+
+        // Pre-optimize for performance
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force GPU acceleration for smoother animations
+            const elements = document.querySelectorAll('.new-employee-side, .login-side, .right-content, .left-content, .circle-btn, .welcome-icon');
+            elements.forEach(el => {
+                el.style.transform = 'translateZ(0)';
+            });
+            
+            // Disable animations for users who prefer reduced motion
+            const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (mediaQuery.matches) {
+                document.querySelectorAll('*').forEach(el => {
+                    el.style.animation = 'none !important';
+                    el.style.transition = 'none !important';
+                });
+            }
+        });
+    </script>
+    
+    <!-- Load real authentication after UI initialization -->
+    <script src="js/employee-auth.js"></script>
+</body>
+</html>

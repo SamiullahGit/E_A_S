@@ -1,0 +1,9 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "python backend/run.py"
+restartPolicyMaxRetries = 5
+
+[env]
+PYTHON_VERSION = "3.11"
